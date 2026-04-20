@@ -70,22 +70,6 @@ export function ProjectFormModal({ project, onSave, onCancel }: Props) {
     featured: project?.featured ?? false,
   });
 
-  // Populate form when editing
-  // useEffect(() => {
-  //   if (project) {
-  //     setForm({
-  //       title: project.title,
-  //       description: project.description,
-  //       category: project.category,
-  //       tags: project.tags.join(", "),
-  //       liveUrl: project.liveUrl,
-  //       githubUrl: project.githubUrl,
-  //       thumbnail: project.thumbnail ?? "",
-  //       color: project.color,
-  //       featured: project.featured ?? false,
-  //     });
-  //   }
-  // }, [project]);
 
   // Inside ProjectFormModal
   function set<K extends keyof FormData>(key: K, val: FormData[K]) {
