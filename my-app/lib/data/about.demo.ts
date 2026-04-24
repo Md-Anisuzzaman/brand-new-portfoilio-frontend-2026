@@ -113,3 +113,4 @@ export const DEMO_ABOUT: AboutData = {
     },
   ],
 }
+

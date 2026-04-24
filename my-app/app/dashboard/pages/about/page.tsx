@@ -1,26 +1,28 @@
-export default function EditAboutPage() {
-  return (
-    <div>
-      <h1>Edit About Page</h1>
-      <p>Changes here will appear on <strong>/about</strong></p>
+import { User } from 'lucide-react'
+import { AboutCMS } from './AboutCMS'
+import { dashboardGetAbout } from '@/lib/services/about.services'
 
-      <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label>Page Title</label><br />
-          <input defaultValue="About Me" style={{ width: '100%', padding: '8px', marginTop: '4px' }} />
+export default async function DashboardAboutPage() {
+  const about = await dashboardGetAbout()
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950
+                        flex items-center justify-center">
+          <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
         </div>
         <div>
-          <label>About Text</label><br />
-          <textarea rows={6} defaultValue="I am a developer based in..." style={{ width: '100%', padding: '8px', marginTop: '4px' }} />
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
+            About Page
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Manage your public about page content
+          </p>
         </div>
-        <div>
-          <label>Skills (comma separated)</label><br />
-          <input defaultValue="React, Next.js, Node.js, TypeScript" style={{ width: '100%', padding: '8px', marginTop: '4px' }} />
-        </div>
-        <button style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
-          Save Changes
-        </button>
       </div>
+
+      <AboutCMS initial={about} />
     </div>
   )
 }
