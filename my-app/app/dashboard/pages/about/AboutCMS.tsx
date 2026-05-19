@@ -13,7 +13,13 @@ import {
   CheckCircle2,
   Check,
 } from "lucide-react";
-import { AboutData, Experience, Education, Value } from "@/lib/types/about";
+import {
+  AboutData,
+  Experience,
+  Education,
+  Value,
+  AboutHero,
+} from "@/lib/types/about";
 import { HeroModal } from "./HeroModal";
 import { ExperienceModal } from "./ExperienceModal";
 import { EducationModal } from "./EducationModal";
@@ -127,6 +133,7 @@ export function AboutCMS({ initial }: { initial: AboutData }) {
   const [educations, setEducations] = useState(initial.educations);
   const [values, setValues] = useState(initial.values);
   const [toast, setToast] = useState<string | null>(null);
+  // const [imageFile, setImageFile] = useState<File | null>(null);
 
   // ── Modal state ───────────────────────────────────────────
   const [showHeroModal, setShowHeroModal] = useState(false);
@@ -185,12 +192,58 @@ export function AboutCMS({ initial }: { initial: AboutData }) {
   }, [values, valSearch]);
 
   // ── Hero ──────────────────────────────────────────────────
-  async function handleSaveHero(data: Partial<typeof hero>) {
-    const updated = await dashboardUpdateHero(data);
-    setHero(updated);
-    setShowHeroModal(false);
-    showToast("Hero section updated");
-  }
+
+  const handleSaveHero = async (
+    values: Partial<AboutHero> & {
+      imageFile?: File | null;
+    },
+  ) => {
+    try {
+      const formData = new FormData();
+      if (values.name) formData.append("name", values.name);
+      if (values.title) formData.append("title", values.title);
+      if (values.subtitle) formData.append("subtitle", values.subtitle);
+      if (values.location) formData.append("location", values.location);
+      if (values.experience) {
+        formData.append("experience", values.experience);
+      }
+
+      if (values.resumeUrl) {
+        formData.append("resumeUrl", values.resumeUrl);
+      }
+
+      if (values.bio) {
+        formData.append("bio", JSON.stringify(values.bio));
+      }
+
+
+      // ✅ FILE upload (Cloudinary)
+      if (values.imageFile) {
+        formData.append("image", values.imageFile);
+      }
+
+      // ✅ URL upload (IMPORTANT FIX)
+      else if (values.image) {
+        formData.append("image", values.image);
+      }
+
+      for (const pair of formData.entries()) {
+        console.log("FORM:", pair[0], pair[1]);
+      }
+
+      const updatedHero = await dashboardUpdateHero(formData);
+
+      setHero(updatedHero);
+
+      setShowHeroModal(false);
+
+      showToast("Hero section updated successfully");
+    } catch (error: any) {
+      console.error("Error updating hero:", error);
+
+      showToast(error.message || "Failed to update hero");
+    }
+  };
 
   // ── Experience CRUD ───────────────────────────────────────
   async function handleSaveExp(data: Omit<Experience, "id">) {

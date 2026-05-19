@@ -14,13 +14,23 @@ import { inputCls, labelCls } from "@/components/ui/shared";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+// interface Props {
+//   hero: AboutHero;
+//   onSave: (data: Partial<AboutHero>) => Promise<void>;
+//   onCancel: () => void;
+// }
+type HeroSaveData = Partial<AboutHero> & {
+  imageFile?: File | null;
+};
+
 interface Props {
   hero: AboutHero;
-  onSave: (data: Partial<AboutHero>) => Promise<void>;
+  onSave: (data: HeroSaveData) => Promise<void>;
   onCancel: () => void;
 }
 
 export function HeroModal({ hero, onSave, onCancel }: Props) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
@@ -40,16 +50,31 @@ export function HeroModal({ hero, onSave, onCancel }: Props) {
   );
 
   // FIX: Handle Image Upload (Converts file to Base64 string)
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setImage(reader.result as string); // This string will be saved to MongoDB
+  //       setImageError(false);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string); // This string will be saved to MongoDB
-        setImageError(false);
-      };
-      reader.readAsDataURL(file);
-    }
+
+    if (!file) return;
+
+    setSelectedFile(file);
+
+    // preview only
+    const previewUrl = URL.createObjectURL(file);
+
+    setImage(previewUrl);
+
+    setImageError(false);
   };
 
   // Biography array helpers
@@ -64,7 +89,7 @@ export function HeroModal({ hero, onSave, onCancel }: Props) {
     setBio((prev) => prev.filter((_, idx) => idx !== i));
   }
 
-  // Submit logic
+  //Submit logic
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !title.trim()) return;
@@ -76,8 +101,11 @@ export function HeroModal({ hero, onSave, onCancel }: Props) {
       location,
       experience,
       resumeUrl,
-      image: image.trim() || null,
-      bio: bio.filter((p) => p.trim()),
+      // bio: bio.filter((p) => p.trim()),
+      // imageFile: selectedFile,
+
+      image: uploadMode === "url" ? image : undefined,
+      imageFile: selectedFile,
     });
     setLoading(false);
   }
